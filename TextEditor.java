@@ -300,13 +300,13 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
             pageSetupDialog.setSize(300, 100);
             pageSetupDialog.setVisible(true);
         }
-        if(arg.equals("Find")){
+        if(arg.equals("Find")){//Need to finish
 
         }
-        if(arg.equals("FindAll")){
+        if(arg.equals("FindAll")){//Need to finish
 
         }
-        if(arg.equals("Replace")){
+        if(arg.equals("Replace")){//Need to finish
 
         }
 
