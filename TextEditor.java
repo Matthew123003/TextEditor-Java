@@ -1,13 +1,15 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.PrinterException;
 import java.io.*;
 import java.util.*;
 
 //TextEditor class starts here
 class TextEditor extends Frame implements ActionListener {
-    TextArea ta = new TextArea();
+    JTextArea ta = new JTextArea();
     int i, len1, len, pos1;
-    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "";
+    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", filePath = "";
     String months[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
             "October", "November", "December" };
     CheckboxMenuItem chkb = new CheckboxMenuItem("Word Wrap");
@@ -79,6 +81,7 @@ class TextEditor extends Frame implements ActionListener {
                 s2 = fd1.getFile();
                 s3 = fd1.getDirectory();
                 s32 = s3 + s2;
+                filePath = s32;
                 File f = new File(s32);
                 FileInputStream fii = new FileInputStream(f);
                 len = (int) f.length();
@@ -98,6 +101,7 @@ class TextEditor extends Frame implements ActionListener {
                 s7 = dialog1.getDirectory();
                 s8 = dialog1.getFile();
                 s9 = s7 + s8 + ".txt";
+                filePath = s9;
                 s6 = ta.getText();
                 len1 = s6.length();
                 byte buf[] = s6.getBytes();
@@ -154,6 +158,39 @@ class TextEditor extends Frame implements ActionListener {
             d1.setVisible(true);
             setSize(500, 500);
         }
+        if(arg.equals("Print")){//This is for the new print button and how to add it
+            try {
+                ta.print();
+            } catch (PrinterException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(arg.equals("Save")){
+            s6 = ta.getText();
+            len1 = s6.length();
+            byte buf[] = s6.getBytes();
+            if(!filePath.isEmpty()){
+                File f1 = new File(filePath);//This sets the file path, came from Open and Save As
+                FileOutputStream fobj1 = null;//This can also become its own method for ease of use
+                try {                         //Try Catches everywhere for this
+                    fobj1 = new FileOutputStream(f1);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                for (int k = 0; k < len1; k++) {
+                    try {
+                        fobj1.write(buf[k]);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                try {
+                    fobj1.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
     public static void main(String args[]) {
         TextEditor to = new TextEditor();
@@ -180,6 +217,21 @@ class AboutDialog extends Dialog implements ActionListener {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         setSize(500, 300);
     }
+
+
+    public void actionPerformed(ActionEvent ae) {
+        dispose();
+    }
+}
+
+class HelpDialog extends Dialog implements ActionListener {
+    HelpDialog(Frame parent, String title) {
+        super(parent, title, false);
+        this.setResizable(false);
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setSize(500, 300);
+    }
+
 
     public void actionPerformed(ActionEvent ae) {
         dispose();
