@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 //TextEditor class starts here
-class TextEditor extends Frame implements ActionListener {
+class TextEditor extends Frame implements ActionListener, ItemListener {
     JTextArea ta = new JTextArea();
     int i, len1, len, pos1;
     String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", filePath = "";
@@ -14,10 +14,78 @@ class TextEditor extends Frame implements ActionListener {
             "October", "November", "December" };
     CheckboxMenuItem chkb = new CheckboxMenuItem("Word Wrap");
 
+    private Integer[] fontSizes = {9, 10, 11, 12, 13, 14, 15, 16,17,18,19,20,22,24,26,28,30};
+    JComboBox fontList = new JComboBox(fontSizes);
+
+    Font font;
+    Integer fontStyle, fontSize;
+
+    JToolBar tlBar;
+
+    JLabel lbFontSize;
+
+
+
     public TextEditor() {
         MenuBar mb = new MenuBar();
         setLayout(new BorderLayout());
         add("Center", ta);
+
+        //Add font bar to JTextPanel
+        tlBar = new JToolBar();
+        JButton button_FontPlain = new JButton("Plain");
+        JButton button_FontBold = new JButton("Bold");
+        JButton button_FontItalic = new JButton("Italic");
+        button_FontBold.setVisible(true);
+        button_FontBold.setBounds(30,50,40,40);
+        button_FontItalic.setVisible(true);
+        button_FontItalic.setBounds(90,50,40,40);
+        lbFontSize = new JLabel("Font Size");
+        //fontList.setSelectedIndex(17);
+        fontList.addActionListener(this);
+
+        tlBar.add(button_FontPlain);
+        tlBar.add(button_FontBold);
+        tlBar.add(button_FontItalic);
+        tlBar.add(lbFontSize);
+        tlBar.add(fontList);
+        this.add(tlBar, BorderLayout.NORTH);
+
+        button_FontPlain.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fontStyle = Font.PLAIN;
+                font = new Font("Arial", fontStyle, fontSize);
+                ta.setFont(font);
+            }
+        });
+        button_FontBold.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fontStyle = Font.BOLD;
+                font = new Font("Arial", fontStyle, fontSize);
+                ta.setFont(font);
+            }
+        });
+
+        button_FontItalic.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fontStyle = Font.ITALIC;
+                font = new Font("Arial", fontStyle, fontSize);
+                ta.setFont(font);
+            }
+        });
+
+        fontList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fontSize = (Integer) fontList.getSelectedItem();
+                font = new Font("Arial", fontStyle, fontSize);
+                ta.setFont(font);
+            }
+        });
+
         setMenuBar(mb);
         Menu m1 = new Menu("File");
         Menu m2 = new Menu("Edit");
@@ -61,8 +129,15 @@ class TextEditor extends Frame implements ActionListener {
         MyWindowsAdapter mw = new MyWindowsAdapter(this);
         addWindowListener(mw);
         setSize(500, 500);
-        setTitle("untitled notepad");
+        setTitle("Matt notepad");
         setVisible(true);
+
+        //Add Scrolling to window
+        JScrollPane scroll = new JScrollPane(ta);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);//Sets the vertical scroll pane to always visible
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);//Sets the horizontal scroll pane to always visible
+        add(scroll);
+
     }
 
     public void actionPerformed(ActionEvent ae) {
@@ -196,11 +271,25 @@ class TextEditor extends Frame implements ActionListener {
                 }
             }
         }
+        if(arg.equals("Find")){
+
+        }
+        if(arg.equals("FindAll")){
+
+        }
+        if(arg.equals("Replace")){
+
+        }
+
     }
     public static void main(String args[]) {
         TextEditor to = new TextEditor();
     }
 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+
+    }
 }
 
 class MyWindowsAdapter extends WindowAdapter {
@@ -220,8 +309,8 @@ class AboutDialog extends Dialog implements ActionListener {
         super(parent, title, false);
         this.setResizable(false);
         setLayout(new FlowLayout(FlowLayout.LEFT));
-        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
         setSize(500, 300);
+        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
         JTextArea jta = new JTextArea();//Creates and adds text area to display about text
         jta.setEditable(false);//Make it so the JText are cant be edited
         jta.append("TextEditor is a simple text editing application.\n");
@@ -249,10 +338,9 @@ class HelpDialog extends Dialog implements ActionListener {
         setSize(500, 300);
         JTextArea jta = new JTextArea();//Creates and adds text area to display about text
         JScrollPane scrollPane = new JScrollPane(jta);//Creates the instance of Scroll to be used
-        add(jta);//Sets text to the center of JText area
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);//Sets the vertical scroll pane to always visible
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);//Sets the horizontal scroll pane to always visible
-        jta.add(scrollPane);
+
         jta.setEditable(false);//Make it so the JText are cant be edited
         jta.append("Welcome to the TextEditor Help!\n\n");
         jta.append("File Menu:\n");
@@ -275,6 +363,8 @@ class HelpDialog extends Dialog implements ActionListener {
         JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
         closeButton.addActionListener(this);//This performs the close method
         add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
+        add(jta);//Sets text to the center of JText area
+        //add(scrollPane);
     }
 
 
