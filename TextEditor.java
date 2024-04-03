@@ -248,6 +248,9 @@ class HelpDialog extends Dialog implements ActionListener {
         setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
         setSize(500, 300);
         JTextArea jta = new JTextArea();//Creates and adds text area to display about text
+        JScrollPane scrollPane = new JScrollPane(jta);//Creates the instance of Scroll to be used
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);//Sets the vertical scroll pane to always visible
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);//Sets the horizontal scroll pane to always visible
         jta.setEditable(false);//Make it so the JText are cant be edited
         jta.append("Welcome to the TextEditor Help!\n\n");
         jta.append("File Menu:\n");
@@ -267,7 +270,7 @@ class HelpDialog extends Dialog implements ActionListener {
         jta.append("- Time Stamp: Insert a time stamp at the current cursor position\n");
         jta.append("- About TextEditor: Display information about the TextEditor\n");
         jta.append("- Help Topics: Display help information about the TextEditor\n");
-        add(jta, BorderLayout.CENTER);//Sets text to the center of JText area
+        add(jta, FlowLayout.CENTER);//Sets text to the center of JText area
         JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
         closeButton.addActionListener(this);//This performs the close method
         add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
