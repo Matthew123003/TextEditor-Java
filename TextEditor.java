@@ -271,6 +271,35 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
                 }
             }
         }
+        if(arg.equals("Page Setup")){
+            // Display a dialog to allow the user to choose orientation
+            Dialog pageSetupDialog = new Dialog(this, "Page Setup", true);
+            pageSetupDialog.setLayout(new FlowLayout());
+
+            // Create radio buttons for portrait and landscape orientations
+            CheckboxGroup orientationGroup = new CheckboxGroup();
+            Checkbox portraitCheckbox = new Checkbox("Portrait", orientationGroup, true);
+            Checkbox landscapeCheckbox = new Checkbox("Landscape", orientationGroup, false);
+            pageSetupDialog.add(portraitCheckbox);
+            pageSetupDialog.add(landscapeCheckbox);
+
+            // Add a button to apply the chosen orientation
+            Button applyButton = new Button("Apply");
+            applyButton.addActionListener(event -> {
+                // Determine the chosen orientation and adjust the text editor accordingly
+                if (portraitCheckbox.getState()) {
+                    setSize(500, 500); // Adjust size for portrait orientation
+                } else {
+                    setSize(700, 400); // Adjust size for landscape orientation
+                }
+                pageSetupDialog.dispose(); // Close the dialog
+            });
+            pageSetupDialog.add(applyButton);
+
+            // Set dialog size and display it
+            pageSetupDialog.setSize(300, 100);
+            pageSetupDialog.setVisible(true);
+        }
         if(arg.equals("Find")){
 
         }
@@ -288,6 +317,16 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+        String arg = (String) e.getItem();
+        if(arg.equals("Word Wrap")){
+            if(chkb.getState()){
+                ta.setLineWrap(true);
+                ta.setWrapStyleWord(true);
+            }else{
+                ta.setLineWrap(false);
+                ta.setWrapStyleWord(false);
+            }
+        }
 
     }
 }
