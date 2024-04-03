@@ -158,6 +158,11 @@ class TextEditor extends Frame implements ActionListener {
             d1.setVisible(true);
             setSize(500, 500);
         }
+        if(arg.equals("Help Topics")){
+            HelpDialog h1 = new HelpDialog(this, "Help");
+            h1.setVisible(true);
+            setSize(500, 500);
+        }
         if(arg.equals("Print")){//This is for the new print button and how to add it
             try {
                 ta.print();
@@ -215,7 +220,18 @@ class AboutDialog extends Dialog implements ActionListener {
         super(parent, title, false);
         this.setResizable(false);
         setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
         setSize(500, 300);
+        JTextArea jta = new JTextArea();//Creates and adds text area to display about text
+        jta.setEditable(false);//Make it so the JText are cant be edited
+        jta.append("TextEditor is a simple text editing application.\n");
+        jta.append("It provides basic functionality such as creating,\n");
+        jta.append("opening, saving, and printing text files.\n");
+        jta.append("It also includes features like cut, copy, paste, find, replace, and more.\n");
+        add(jta, BorderLayout.CENTER);//Sets text to the center of JText area
+        JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
+        closeButton.addActionListener(this);//This performs the close method
+        add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
     }
 
 
@@ -229,7 +245,32 @@ class HelpDialog extends Dialog implements ActionListener {
         super(parent, title, false);
         this.setResizable(false);
         setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
         setSize(500, 300);
+        JTextArea jta = new JTextArea();//Creates and adds text area to display about text
+        jta.setEditable(false);//Make it so the JText are cant be edited
+        jta.append("Welcome to the TextEditor Help!\n\n");
+        jta.append("File Menu:\n");
+        jta.append("- New: Create a new file\n");
+        jta.append("- Open: Open an existing file\n");
+        jta.append("- Save: Save the current file\n");
+        jta.append("- Save As: Save the current file with a different name\n");
+        jta.append("- Page Setup: Configure page settings for printing\n");
+        jta.append("- Print: Print the current file\n");
+        jta.append("- Exit: Exit the TextEditor\n\n");
+        jta.append("Edit Menu:\n");
+        jta.append("- Cut: Cut the selected text\n");
+        jta.append("- Copy: Copy the selected text\n");
+        jta.append("- Paste: Paste the copied or cut text\n");
+        jta.append("- Delete: Delete the selected text\n");
+        jta.append("- Select All: Select all text in the editor\n");
+        jta.append("- Time Stamp: Insert a time stamp at the current cursor position\n");
+        jta.append("- About TextEditor: Display information about the TextEditor\n");
+        jta.append("- Help Topics: Display help information about the TextEditor\n");
+        add(jta, BorderLayout.CENTER);//Sets text to the center of JText area
+        JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
+        closeButton.addActionListener(this);//This performs the close method
+        add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
     }
 
 
