@@ -1,19 +1,23 @@
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PrinterException;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 //TextEditor class starts here
 class TextEditor extends Frame implements ActionListener, ItemListener {
     JTextArea ta = new JTextArea();
     int i, len1, len, pos1;
-    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", filePath = "";
+    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", filePath = "", strFind = "", strReplace = "";
     String months[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
             "October", "November", "December" };
     CheckboxMenuItem chkb = new CheckboxMenuItem("Word Wrap");
-
+    Highlighter highlighter;
+    Highlighter.HighlightPainter painter;
     private Integer[] fontSizes = {9, 10, 11, 12, 13, 14, 15, 16,17,18,19,20,22,24,26,28,30};
     JComboBox fontList = new JComboBox(fontSizes);
 
@@ -301,13 +305,67 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
             pageSetupDialog.setVisible(true);
         }
         if(arg.equals("Find")){//Need to finish
+            strFind = JOptionPane.showInputDialog(ta,"Enter the text to find", null);
+            i = ta.getText().indexOf(strFind);
+
+            if (i >= 0)
+            {
+                try
+                {
+                    highlighter.addHighlight(i, i + strFind.length(), painter);
+                }
+                catch (BadLocationException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
         }
         if(arg.equals("FindAll")){//Need to finish
+            List<Integer> listArray  = new ArrayList<Integer>();
+            int index = 0;
+
+            strFind = JOptionPane.showInputDialog(ta,"Enter the text to find all", null);
+            i = ta.getText().indexOf(strFind);
+
+            for (String line : ta.getText().split("\\n"))
+            {
+                String[] tokens = line.split(" ");
+                for (int j = 0; j < tokens.length; j++)
+                {
+                    if (tokens[j].equals(strFind))
+                    {
+                        listArray.add(index);
+                    }
+                    index = index + tokens[j].length()+1;
+                }
+            }
+
+            for (Integer k : listArray)
+            {
+                if (k >= 0) {
+                    try
+                    {
+                        highlighter.addHighlight(k, k + strFind.length(), painter);
+                    }
+                    catch (BadLocationException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
 
         }
         if(arg.equals("Replace")){//Need to finish
+            strFind = JOptionPane.showInputDialog(ta,"Enter the text to find", null);
+            strReplace = JOptionPane.showInputDialog(ta,"Enter the text to Replace", null);
 
+            i = ta.getText().indexOf(strFind);
+
+            if (i >= 0)
+            {
+                ta.replaceRange(strReplace, i, i + strFind.length());
+            }
         }
 
     }
