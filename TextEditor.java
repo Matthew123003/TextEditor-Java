@@ -1,41 +1,62 @@
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Highlighter;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PrinterException;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.awt.Color;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 //TextEditor class starts here
 class TextEditor extends Frame implements ActionListener, ItemListener {
-    JTextArea ta = new JTextArea();
+    static JTextArea ta = new JTextArea();
+    static File f1;
     int i, len1, len, pos1;
-    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", filePath = "", strFind = "", strReplace = "";
+    String str = "", s3 = "", s2 = "", s4 = "", s32 = "", s6 = "", s7 = "", s8 = "", s9 = "", strFind = "", strReplace = "";
     String months[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
             "October", "November", "December" };
-    CheckboxMenuItem chkb = new CheckboxMenuItem("Word Wrap");
-    Highlighter highlighter;
-    Highlighter.HighlightPainter painter;
-    private Integer[] fontSizes = {9, 10, 11, 12, 13, 14, 15, 16,17,18,19,20,22,24,26,28,30};
+
+    Integer[] fontSizes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 34, 38, 42, 46, 50 };
+
     JComboBox fontList = new JComboBox(fontSizes);
 
-    Font font;
-    Integer fontStyle, fontSize;
+    CheckboxMenuItem chkb = new CheckboxMenuItem("Word Wrap");
+    Highlighter highlighter;
+    HighlightPainter painter;
+
+    // Added Label for About Option
+    JLabel lbAbout, lbFontSize;
 
     JToolBar tlBar;
 
-    JLabel lbFontSize;
-
-
+    Font font;
+    Integer fontStyle, fontSize;
 
     public TextEditor() {
         MenuBar mb = new MenuBar();
         setLayout(new BorderLayout());
         add("Center", ta);
+        ta.setBackground(Color.white);
+        fontStyle = Font.ROMAN_BASELINE;
+        fontSize = 20;
+        font = new Font("Arial", fontStyle, fontSize);
+        ta.setFont(font);
 
-        //Add font bar to JTextPanel
+        lbAbout = new JLabel("");
+
+        // Added Vertical and Horizonal Scrollbar
+        JScrollPane sp = new JScrollPane(ta);
+        sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        add(sp);
+
         tlBar = new JToolBar();
         JButton button_FontPlain = new JButton("Plain");
         JButton button_FontBold = new JButton("Bold");
@@ -45,7 +66,7 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
         button_FontItalic.setVisible(true);
         button_FontItalic.setBounds(90,50,40,40);
         lbFontSize = new JLabel("Font Size");
-        //fontList.setSelectedIndex(17);
+        fontList.setSelectedIndex(10);
         fontList.addActionListener(this);
 
         tlBar.add(button_FontPlain);
@@ -99,13 +120,14 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
         mb.add(m2);
         mb.add(m3);
         mb.add(m4);
+
         MenuItem mi1[] = {
                 new MenuItem("New"), new MenuItem("Open"), new MenuItem("Save"), new MenuItem("Save As"),
                 new MenuItem("Page Setup"), new MenuItem("Print"), new MenuItem("Exit")
         };
         MenuItem mi2[] = { new MenuItem("Delete"), new MenuItem("Cut"),
                 new MenuItem("Copy"), new MenuItem("Paste"), new MenuItem("Find"),
-                new MenuItem("Find Next"), new MenuItem("Replace"),
+                new MenuItem("Find All"), new MenuItem("Replace"),
                 new MenuItem("Go To"), new MenuItem("Select All"),
                 new MenuItem("Time Stamp") };
         MenuItem mi3[] = { new MenuItem("Choose Font"), new MenuItem("Compile"),
@@ -121,7 +143,7 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
             mi2[i].addActionListener(this);
         }
         m3.add(chkb);
-        chkb.addActionListener(this);
+        chkb.addItemListener(this);
         for (int i = 0; i < mi3.length; i++) {
             m3.add(mi3[i]);
             mi3[i].addActionListener(this);
@@ -130,37 +152,37 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
             m4.add(mi4[i]);
             mi4[i].addActionListener(this);
         }
+
+        highlighter = ta.getHighlighter();
+        painter = new DefaultHighlighter.DefaultHighlightPainter(Color.cyan);
+
         MyWindowsAdapter mw = new MyWindowsAdapter(this);
         addWindowListener(mw);
         setSize(500, 500);
-        setTitle("Matt notepad");
+        setTitle("Matt's notepad");
         setVisible(true);
-
-        //Add Scrolling to window
-        JScrollPane scroll = new JScrollPane(ta);
-        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);//Sets the vertical scroll pane to always visible
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);//Sets the horizontal scroll pane to always visible
-        add(scroll);
-
     }
 
     public void actionPerformed(ActionEvent ae) {
         String arg = (String) ae.getActionCommand();
-        if (arg.equals("New")) {
+        highlighter.removeAllHighlights();
+        if (arg.equals("New"))
+        {
             dispose();
             TextEditor t11 = new TextEditor();
             t11.setSize(500, 500);
             t11.setVisible(true);
         }
-        try {
-            if (arg.equals("Open")) {
+        try
+        {
+            if (arg.equals("Open"))
+            {
                 FileDialog fd1 = new FileDialog(this, "Select File", FileDialog.LOAD);
                 fd1.setVisible(true);
                 String s4 = "";
                 s2 = fd1.getFile();
                 s3 = fd1.getDirectory();
                 s32 = s3 + s2;
-                filePath = s32;
                 File f = new File(s32);
                 FileInputStream fii = new FileInputStream(f);
                 len = (int) f.length();
@@ -171,30 +193,30 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
                 ta.setText(s4);
                 fii.close();
             }
-        } catch (IOException e) {
         }
-        try {
-            if (arg.equals("Save As")) {
-                FileDialog dialog1 = new FileDialog(this, "Save As", FileDialog.SAVE);
-                dialog1.setVisible(true);
-                s7 = dialog1.getDirectory();
-                s8 = dialog1.getFile();
-                s9 = s7 + s8 + ".txt";
-                filePath = s9;
-                s6 = ta.getText();
-                len1 = s6.length();
-                byte buf[] = s6.getBytes();
-                File f1 = new File(s9);
-                FileOutputStream fobj1 = new FileOutputStream(f1);
-                for (int k = 0; k < len1; k++) {
-                    fobj1.write(buf[k]);
-                }
-                fobj1.close();
+        catch (IOException e)
+        {
+        }
+        if (arg.equals("Save As"))
+        {
+            try {
+                saveFile(f1, ta);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            this.setTitle(s8 + " TextEditor File");
-        } catch (IOException e) {
+        }
+        this.setTitle(s8 + " TextEditor File");
+        if (arg.equals("Word Wrap")) {
+
         }
         if (arg.equals("Exit")) {
+            if(!ta.getText().isEmpty()) {
+                try {
+                    saveFile(f1, ta);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             System.exit(0);
         }
         if (arg.equals("Cut")) {
@@ -234,77 +256,14 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
         }
         if (arg.equals("About TextEditor")) {
             AboutDialog d1 = new AboutDialog(this, "About TextEditor");
+            d1.add(lbAbout);
+            lbAbout.setText("<HTML><p>This is a custom text editor app. The app can be used to replace notepad or similar <br>" +
+                    " tool for text editor. <br> <br> I hope you enjoy this cool app !!!</p></html>");
             d1.setVisible(true);
             setSize(500, 500);
         }
-        if(arg.equals("Help Topics")){
-            HelpDialog h1 = new HelpDialog(this, "Help");
-            h1.setVisible(true);
-            setSize(500, 500);
-        }
-        if(arg.equals("Print")){//This is for the new print button and how to add it
-            try {
-                ta.print();
-            } catch (PrinterException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if(arg.equals("Save")){
-            s6 = ta.getText();
-            len1 = s6.length();
-            byte buf[] = s6.getBytes();
-            if(!filePath.isEmpty()){
-                File f1 = new File(filePath);//This sets the file path, came from Open and Save As
-                FileOutputStream fobj1 = null;//This can also become its own method for ease of use
-                try {                         //Try Catches everywhere for this
-                    fobj1 = new FileOutputStream(f1);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-                for (int k = 0; k < len1; k++) {
-                    try {
-                        fobj1.write(buf[k]);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                try {
-                    fobj1.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        if(arg.equals("Page Setup")){
-            // Display a dialog to allow the user to choose orientation
-            Dialog pageSetupDialog = new Dialog(this, "Page Setup", true);
-            pageSetupDialog.setLayout(new FlowLayout());
-
-            // Create radio buttons for portrait and landscape orientations
-            CheckboxGroup orientationGroup = new CheckboxGroup();
-            Checkbox portraitCheckbox = new Checkbox("Portrait", orientationGroup, true);
-            Checkbox landscapeCheckbox = new Checkbox("Landscape", orientationGroup, false);
-            pageSetupDialog.add(portraitCheckbox);
-            pageSetupDialog.add(landscapeCheckbox);
-
-            // Add a button to apply the chosen orientation
-            Button applyButton = new Button("Apply");
-            applyButton.addActionListener(event -> {
-                // Determine the chosen orientation and adjust the text editor accordingly
-                if (portraitCheckbox.getState()) {
-                    setSize(500, 500); // Adjust size for portrait orientation
-                } else {
-                    setSize(700, 400); // Adjust size for landscape orientation
-                }
-                pageSetupDialog.dispose(); // Close the dialog
-            });
-            pageSetupDialog.add(applyButton);
-
-            // Set dialog size and display it
-            pageSetupDialog.setSize(300, 100);
-            pageSetupDialog.setVisible(true);
-        }
-        if(arg.equals("Find")){//Need to finish
+        if (arg.equals("Find"))
+        {
             strFind = JOptionPane.showInputDialog(ta,"Enter the text to find", null);
             i = ta.getText().indexOf(strFind);
 
@@ -319,9 +278,9 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
                     throw new RuntimeException(e);
                 }
             }
-
         }
-        if(arg.equals("FindAll")){//Need to finish
+        if (arg.equals("Find All"))
+        {
             List<Integer> listArray  = new ArrayList<Integer>();
             int index = 0;
 
@@ -354,9 +313,9 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
                     }
                 }
             }
-
         }
-        if(arg.equals("Replace")){//Need to finish
+        if (arg.equals("Replace"))
+        {
             strFind = JOptionPane.showInputDialog(ta,"Enter the text to find", null);
             strReplace = JOptionPane.showInputDialog(ta,"Enter the text to Replace", null);
 
@@ -367,105 +326,160 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
                 ta.replaceRange(strReplace, i, i + strFind.length());
             }
         }
+        if (arg.equals("Print"))
+        {
+            try
+            {
+                boolean complete = ta.print();
+                if(complete)
+                {
+                    JOptionPane.showMessageDialog(null, "Done printing","Information", JOptionPane.INFORMATION_MESSAGE );
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null, "Cancel Printing!","Printer", JOptionPane.ERROR_MESSAGE );
+                }
+            }
+            catch (PrinterException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        if (arg.equals("Page Setup"))
+        {
+            SetPageDialog spDialog = new SetPageDialog(this, "Page Setup Dialog");
 
+            JButton button_Portrait = new JButton("Portrait!");
+            JButton button_Landscape = new JButton("Landscape!");
+            button_Portrait.setVisible(true);
+            button_Portrait.setBounds(30,50,40,40);
+            button_Landscape.setVisible(true);
+            button_Landscape.setBounds(90,50,40,40);
+            spDialog.add(button_Portrait);
+            spDialog.add(button_Landscape);
+
+            spDialog.setVisible(true);
+            spDialog.setSize(250, 100);
+
+            button_Portrait.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    spDialog.dispose();
+                    setSize(500, 1000);
+
+                }
+            });
+            button_Landscape.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    spDialog.dispose();
+                    setSize(1000, 500);
+                }
+            });
+        }
+        if (arg.equals("Choose Font"))
+        {
+
+        }
     }
     public static void main(String args[]) {
         TextEditor to = new TextEditor();
     }
 
+    public void saveFile(File file, JTextArea textArea) throws IOException {
+        if (file != null) {
+            String filePath = file.getAbsolutePath();
+            try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePath)))
+            {
+                writer.write(textArea.getText());
+            } catch (IOException e)
+            {
+                System.out.println("savefile exception");
+            }
+        }
+        else
+        {
+            FileDialog dialog1 = new FileDialog(this, "Save As", FileDialog.SAVE);
+            dialog1.setVisible(true);
+            s7 = dialog1.getDirectory();
+            s8 = dialog1.getFile();
+            if(!s7.isEmpty() && !s8.isEmpty()) {
+                s9 = s7 + s8 + ".txt";
+                s6 = ta.getText();
+                len1 = s6.length();
+                byte buf[] = s6.getBytes();
+                f1 = new File(s9);
+                FileOutputStream fobj1 = new FileOutputStream(f1);
+                for (int k = 0; k < len1; k++) {
+                    fobj1.write(buf[k]);
+                }
+                fobj1.close();
+            }
+        }
+    }
+
     @Override
-    public void itemStateChanged(ItemEvent e) {
+    public void itemStateChanged(ItemEvent e)
+    {
         String arg = (String) e.getItem();
-        if(arg.equals("Word Wrap")){
-            if(chkb.getState()){
+        if (arg.equals("Word Wrap"))
+        {
+            if (chkb.getState())
+            {
                 ta.setLineWrap(true);
                 ta.setWrapStyleWord(true);
-            }else{
+            }
+            else
+            {
                 ta.setLineWrap(false);
                 ta.setWrapStyleWord(false);
             }
         }
-
     }
 }
 
 class MyWindowsAdapter extends WindowAdapter {
     TextEditor tt;
 
-    public MyWindowsAdapter(TextEditor ttt) {
+    public MyWindowsAdapter(TextEditor ttt)
+    {
         tt = ttt;
     }
 
-    public void windowClosing(WindowEvent we) {
+    public void windowClosing(WindowEvent we)
+    {
+        if(!TextEditor.ta.getText().isEmpty()) {
+            try {
+                tt.saveFile(TextEditor.f1, TextEditor.ta);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         tt.dispose();
+
     }
 }
 
-class AboutDialog extends Dialog implements ActionListener {
+class AboutDialog extends JDialog implements ActionListener {
     AboutDialog(Frame parent, String title) {
         super(parent, title, false);
         this.setResizable(false);
         setLayout(new FlowLayout(FlowLayout.LEFT));
         setSize(500, 300);
-        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
-        JTextArea jta = new JTextArea();//Creates and adds text area to display about text
-        jta.setEditable(false);//Make it so the JText are cant be edited
-        jta.append("TextEditor is a simple text editing application.\n");
-        jta.append("It provides basic functionality such as creating,\n");
-        jta.append("opening, saving, and printing text files.\n");
-        jta.append("It also includes features like cut, copy, paste, find, replace, and more.\n");
-        add(jta, BorderLayout.CENTER);//Sets text to the center of JText area
-        JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
-        closeButton.addActionListener(this);//This performs the close method
-        add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
     }
-
 
     public void actionPerformed(ActionEvent ae) {
         dispose();
     }
 }
 
-class HelpDialog extends Dialog implements ActionListener {
-    HelpDialog(Frame parent, String title) {
+class SetPageDialog extends JDialog implements ActionListener {
+    SetPageDialog(Frame parent, String title) {
         super(parent, title, false);
         this.setResizable(false);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        setLayout(new BorderLayout());//Created to keep close button around the border of the JText area, aesthetics only
-        setSize(500, 300);
-        JTextArea jta = new JTextArea();//Creates and adds text area to display about text
-        JScrollPane scrollPane = new JScrollPane(jta);//Creates the instance of Scroll to be used
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);//Sets the vertical scroll pane to always visible
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);//Sets the horizontal scroll pane to always visible
-
-        jta.setEditable(false);//Make it so the JText are cant be edited
-        jta.append("Welcome to the TextEditor Help!\n\n");
-        jta.append("File Menu:\n");
-        jta.append("- New: Create a new file\n");
-        jta.append("- Open: Open an existing file\n");
-        jta.append("- Save: Save the current file\n");
-        jta.append("- Save As: Save the current file with a different name\n");
-        jta.append("- Page Setup: Configure page settings for printing\n");
-        jta.append("- Print: Print the current file\n");
-        jta.append("- Exit: Exit the TextEditor\n\n");
-        jta.append("Edit Menu:\n");
-        jta.append("- Cut: Cut the selected text\n");
-        jta.append("- Copy: Copy the selected text\n");
-        jta.append("- Paste: Paste the copied or cut text\n");
-        jta.append("- Delete: Delete the selected text\n");
-        jta.append("- Select All: Select all text in the editor\n");
-        jta.append("- Time Stamp: Insert a time stamp at the current cursor position\n");
-        jta.append("- About TextEditor: Display information about the TextEditor\n");
-        jta.append("- Help Topics: Display help information about the TextEditor\n");
-        JButton closeButton = new JButton("Close");//Creates a close button to close dialog box
-        closeButton.addActionListener(this);//This performs the close method
-        add(closeButton, BorderLayout.SOUTH);//This sets the close button to the bottom of the page
-        add(jta);//Sets text to the center of JText area
-        //add(scrollPane);
+        setLayout(new FlowLayout(FlowLayout.CENTER));
     }
-
-
-    public void actionPerformed(ActionEvent ae) {
-        dispose();
+    @Override
+    public void actionPerformed(ActionEvent e) {
     }
 }
