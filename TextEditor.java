@@ -210,13 +210,13 @@ class TextEditor extends Frame implements ActionListener, ItemListener {
 
         }
         if (arg.equals("Exit")) {
-            if(!ta.getText().isEmpty()) {
-                try {
-                    saveFile(f1, ta);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+//            if(!ta.getText().isEmpty()) {
+//                try {
+//                    saveFile(f1, ta);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
             System.exit(0);
         }
         if (arg.equals("Cut")) {
